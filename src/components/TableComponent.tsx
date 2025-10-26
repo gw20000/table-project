@@ -44,7 +44,7 @@ const TableComoponent = () => {
 
     
 const { users, loading, error, fetchUsers, add, del, clear, update} = useUserStore(useShallow(
-  (state:any) => ({
+  (state) => ({
     users: state.users,
     loading: state.loading,
     error: state.error,
@@ -58,7 +58,8 @@ const { users, loading, error, fetchUsers, add, del, clear, update} = useUserSto
  
 
   useEffect(() => {
-    fetchUsers();
+   const controller =  fetchUsers();
+    return () => controller.abort()  
    }, [fetchUsers]);
 
    const addUser = () => {
@@ -75,7 +76,7 @@ const { users, loading, error, fetchUsers, add, del, clear, update} = useUserSto
 
  
 
-    const tableBodyContent = users.map((user: User) => (
+    const tableBodyContent = users.map((user) => (
       <tr key={user.id}>
         <td>{user.name}</td>
         <td>{user.gender === 0 ? '男' : '女'}</td>
@@ -87,9 +88,13 @@ const { users, loading, error, fetchUsers, add, del, clear, update} = useUserSto
         </td>
       </tr>
     ));
-    
+    const btnAdd= <button className={styles.add} onClick={addUser}>add</button>
+    const btnsPreserve = <div className={styles.btnsPreserve}>
+       {btnAdd}
+    </div>
+ 
     const btns = <div className={styles.btns}>
-       <button className={styles.add} onClick={addUser}>add</button>
+       {btnAdd}
         <button className={styles.clear}onClick={clear}>clear</button>
     </div>
 
@@ -113,7 +118,7 @@ const { users, loading, error, fetchUsers, add, del, clear, update} = useUserSto
     return <>
     
        { loading ? <MyIcon name='Loading' className={styles.loading}/> :
-        error ?<div className={styles.error}><ErrorBox msg={error}/> </div> : users.length===0 ? <div className={styles.empty}><EmptyBox/> </div> :  
+        error ?<div className={styles.error}><ErrorBox msg={error}/> </div> : users.length===0 ?<>{btnsPreserve}<div className={styles.empty}><EmptyBox/> </div> </> :  
         mainContent
       }
     </>
